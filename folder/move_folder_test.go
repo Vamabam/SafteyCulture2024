@@ -105,6 +105,14 @@ func Test_folder_MoveFolder(t *testing.T) {
 			want:    []folder.Folder{},
 			wantErr: errors.New("destination folder does not exist"),
 		},
+		{
+			name:    "Move Root",
+			src:     "alpha",
+			dst:     "delta",
+			folders: sampleFolders,
+			want:    []folder.Folder{},
+			wantErr: errors.New("cannot move a folder to a child of itself"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
