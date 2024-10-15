@@ -7,10 +7,10 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-//   - Inputs: source folder , destination folder
-//   - Returns: Full data structure with folders moved to destination
 //   - Moves source folder and all children to destination while
 //     keeping folder hierarchy
+//   - Inputs: Source folder, destination folder
+//   - Returns: Full data structure with folders moved to destination
 func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	// Check if source and dest are the same value
 	if name == dst {
@@ -79,9 +79,9 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	return res, nil
 }
 
-// - Input: name of folder
-// - Returns: Folder data type
 // - Gets the Folder data of the folder that has the name given
+// - Input: Name of folder
+// - Returns: Folder data type
 func (f *driver) getFolder(name string) Folder {
 	folder := Folder{}
 	folders := f.folders
