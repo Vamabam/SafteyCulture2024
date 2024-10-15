@@ -61,8 +61,6 @@ func Test_folder_GetFoldersByOrgID(t *testing.T) {
 	}
 }
 
-// add test case for 1 child
-// add test case for middle child
 func Test_folder_GetAllChildFolders(t *testing.T) {
 	t.Parallel()
 
