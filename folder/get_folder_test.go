@@ -12,13 +12,44 @@ import (
 // feel free to change how the unit test is structured
 func Test_folder_GetFoldersByOrgID(t *testing.T) {
 	t.Parallel()
+
+	orgId := uuid.FromStringOrNil("38b9879b-f73b-4b0e-b9d9-4fc4c23643a7")
+	orgId2 := uuid.FromStringOrNil("18b2873b-f73b-4b0e-b9d9-4fc4c23646a8")
+	orgId3 := uuid.FromStringOrNil("26b2873b-f36b-6b1e-b9d9-4fc4c23646a8")
+
+	sampleFolders := []folder.Folder{
+		{Name: "creative-scalphunter", OrgId: orgId, Paths: "creative-scalphunter"},
+		{Name: "clear-arclight", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight"},
+		{Name: "topical-micromax", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax"},
+		{Name: "bursting-lionheart", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart"},
+		{Name: "striking-black-panther", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart.striking-black-panther"},
+		{Name: "noble-vixen", OrgId: orgId2, Paths: "noble-vixen"},
+	}
+
 	tests := [...]struct {
 		name    string
 		orgId   uuid.UUID
 		folders []folder.Folder
 		want    []folder.Folder
 	}{
-		// TEsts
+		{
+			name:    "Valid Case",
+			orgId:   orgId,
+			folders: sampleFolders,
+			want: []folder.Folder{
+				{Name: "creative-scalphunter", OrgId: orgId, Paths: "creative-scalphunter"},
+				{Name: "clear-arclight", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight"},
+				{Name: "topical-micromax", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax"},
+				{Name: "bursting-lionheart", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart"},
+				{Name: "striking-black-panther", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart.striking-black-panther"},
+			},
+		},
+		{
+			name:    "Invalid Input",
+			orgId:   orgId3,
+			folders: sampleFolders,
+			want:    []folder.Folder{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
