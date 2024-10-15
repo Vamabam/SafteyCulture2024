@@ -33,7 +33,6 @@ func Test_folder_MoveFolder(t *testing.T) {
 		want    []folder.Folder
 		wantErr error
 	}{
-		// Test Cases
 		{
 			name:    "Valid case multiple Paths",
 			src:     "bravo",
