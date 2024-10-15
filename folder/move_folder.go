@@ -7,13 +7,17 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+//   - Inputs: source folder , destination folder
+//   - Returns: Full data structure with folders moved to destination
+//   - Moves source folder and all children to destination while
+//     keeping folder hierarchy
 func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
-	// Check if same
+	// Check if source and dest are the same value
 	if name == dst {
 		return []Folder{},
 			errors.New("cannot move a folder to itself")
 	}
-	// Get org Id of source and dest
+	// Get orgID of source and dest
 	srcFolder := f.getFolder(name)
 	dstFolder := f.getFolder(dst)
 
@@ -33,17 +37,18 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 			errors.New("cannot move a folder to a different organization")
 	}
 
-	// Get all child folders
+	// Get all children
 	childFolders, _ := f.GetAllChildFolders(srcFolder.OrgId, name)
 
-	// Check if destination is a child of Source
+	// Check if destination is a child of source
 	for _, folder := range childFolders {
 		if folder.Name == dst {
 			return []Folder{},
 				errors.New("cannot move a folder to a child of itself")
 		}
 	}
-	// Get Destination Path
+
+	// Get destination path
 	dstPathSplit := strings.Split(dstFolder.Paths, ".")
 	// Go through paths and append to dest path
 	res := []Folder{}
@@ -76,7 +81,9 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	return res, nil
 }
 
-// Helper function to get folder from name
+// - Input: name of folder
+// - Returns: Folder data type
+// - Gets the Folder data of the folder that has the name given
 func (f *driver) getFolder(name string) Folder {
 	folder := Folder{}
 	folders := f.folders
