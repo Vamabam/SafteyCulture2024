@@ -25,30 +25,28 @@ func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) []Folder {
 
 }
 
+// - Gets all the child folders of the given folder within Org
 // - Inputs: OrgID and name of folder
 // - Returns: Array of Child Folders and Errors
-// - Gets all the child folders of the given folder within Org
 func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, error) {
 	// Get all paths from org
 	allFolders := f.GetFoldersByOrgID(orgID)
 
-	// Check if Invalid Org
+	// Check if invalid org
 	if len(allFolders) < 1 {
 		return []Folder{}, errors.New("OrgID does not exist")
 	}
 
-	children := []Folder{}
-	for _, Folder := range allFolders {
-		// Split paths by .
-		splitPaths := strings.Split(Folder.Paths, ".")
+	// Construct the path prefix to search for
+	folder := f.getFolder(name)
+	namePrefix := folder.Paths + "."
 
-		// Check if name exists in split paths
-		// len(splitPaths) - 1 as final folder in path has no children
-		for i := 0; i < len(splitPaths)-1; i++ {
-			// If name is found add whole Folder struct to children
-			if splitPaths[i] == name && len(splitPaths) > 1 {
-				children = append(children, Folder)
-			}
+	children := []Folder{}
+	// Iterate over all folders in the org and find children folders
+	for _, folder := range allFolders {
+		// Check if the folder path starts with "name."
+		if strings.HasPrefix(folder.Paths, namePrefix) {
+			children = append(children, folder)
 		}
 	}
 
@@ -64,7 +62,7 @@ func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, err
 				return []Folder{}, nil
 			}
 		}
-		// File isnt in the system at all
+		// File isn't in the system at all
 		return []Folder{}, errors.New("Folder doesn't exist")
 	} else {
 		return children, nil
