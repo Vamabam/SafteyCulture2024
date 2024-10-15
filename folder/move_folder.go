@@ -37,38 +37,36 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 			errors.New("cannot move a folder to a different organization")
 	}
 
-	// Get all children
-	childFolders, _ := f.GetAllChildFolders(srcFolder.OrgId, name)
+	allFolders := f.GetFoldersByOrgID(srcFolder.OrgId)
 
-	// Check if destination is a child of source
+	// Get all children of the source folder and map to hashmap
+	childFoldersMap := make(map[string]bool)
+	childFolders, _ := f.GetAllChildFolders(srcFolder.OrgId, name)
 	for _, folder := range childFolders {
-		if folder.Name == dst {
-			return []Folder{},
-				errors.New("cannot move a folder to a child of itself")
-		}
+		childFoldersMap[folder.Name] = true
 	}
 
-	// Get destination path
-	dstPathSplit := strings.Split(dstFolder.Paths, ".")
-	// Go through paths and append to dest path
-	res := []Folder{}
-	allFolders := f.GetFoldersByOrgID(srcFolder.OrgId)
-	for _, folder := range allFolders {
-		// Split paths by .
-		splitPaths := strings.Split(folder.Paths, ".")
-		// Find in path and splice in dest
-		for i := 0; i < len(splitPaths); i++ {
-			if splitPaths[i] == name {
-				// Append child path to destPath
-				splitPaths = append(dstPathSplit, splitPaths[i:]...)
-				break
-			}
-		}
-		// Join Paths back together and add to Folder struct
-		joined := strings.Join(splitPaths, ".")
-		folder.Paths = joined
+	// Check if destination is a child of the source
+	if childFoldersMap[dst] {
+		return []Folder{}, errors.New("cannot move a folder to a child of itself")
+	}
 
-		res = append(res, folder)
+	// Prepare the destination path prefix
+	dstPathPrefix := dstFolder.Paths + "."
+	// Prepare the result list
+	res := []Folder{}
+
+	// Update paths for all folders that need to be moved
+	for _, folder := range allFolders {
+		// If the folder's path starts with the source folder's path, update it
+		if strings.HasPrefix(folder.Paths, srcFolder.Paths) {
+			newPath := strings.Replace(folder.Paths, srcFolder.Paths, dstPathPrefix+name, 1)
+			folder.Paths = newPath
+			res = append(res, folder)
+		} else {
+			// Keep the other folders unchanged
+			res = append(res, folder)
+		}
 	}
 
 	// Append all unedited orginastions to modified data system
