@@ -61,6 +61,8 @@ func Test_folder_GetFoldersByOrgID(t *testing.T) {
 	}
 }
 
+// add test case for 1 child
+// add test case for middle child
 func Test_folder_GetAllChildFolders(t *testing.T) {
 	t.Parallel()
 
@@ -103,20 +105,36 @@ func Test_folder_GetAllChildFolders(t *testing.T) {
 			folderName: "non-existing-folder",
 			folders:    sampleFolders,
 			want:       []folder.Folder{},
-			wantErr:    errors.New("Folder doesn't Exist"),
+			wantErr:    errors.New("Folder doesn't exist"),
 		},
 		{
 			name:       "Invalid orgID",
-			orgId:      uuid.Must(uuid.NewV4()), // A new UUID not matching the sample data
+			orgId:      uuid.Must(uuid.NewV4()),
 			folderName: "creative-scalphunter",
 			folders:    sampleFolders,
 			want:       []folder.Folder{},
-			wantErr:    errors.New("invalid orgid"),
+			wantErr:    errors.New("OrgID does not exist"),
 		},
 		{
 			name:       "Single Folder No Children",
 			orgId:      orgId,
 			folderName: "striking-black-panther",
+			folders:    sampleFolders,
+			want:       []folder.Folder{},
+			wantErr:    nil,
+		},
+		{
+			name:       "Folder exists in different org",
+			orgId:      orgId,
+			folderName: "noble-vixen",
+			folders:    sampleFolders,
+			want:       []folder.Folder{},
+			wantErr:    errors.New("Folder does not exist in the specified organization"),
+		},
+		{
+			name:       "Single Child",
+			orgId:      orgId,
+			folderName: "bursting-lionheart",
 			folders:    sampleFolders,
 			want: []folder.Folder{
 				{Name: "striking-black-panther", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart.striking-black-panther"},
@@ -124,12 +142,15 @@ func Test_folder_GetAllChildFolders(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name:       "Folder exists in different org",
-			orgId:      orgId2,
-			folderName: "noble-vixen",
+			name:       "Middle Child",
+			orgId:      orgId,
+			folderName: "topical-micromax",
 			folders:    sampleFolders,
-			want:       []folder.Folder{},
-			wantErr:    errors.New("Folder does not exist in the specified organization"),
+			want: []folder.Folder{
+				{Name: "bursting-lionheart", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart"},
+				{Name: "striking-black-panther", OrgId: orgId, Paths: "creative-scalphunter.clear-arclight.topical-micromax.bursting-lionheart.striking-black-panther"},
+			},
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
